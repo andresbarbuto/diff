@@ -15,7 +15,7 @@ while ($row_quiz_info = getQls()->SQL->fetch_row($quiz_info)) {
 		LIMIT 1") or die(getQls()->SQL->error());
 
 	$now = gmdate("Y-m-d H:i:s");
-	getQls()->SQL->query("INSERT IGNORE INTO reading_timed (user_id, lesson_id, created_at, reading_time) 
+	getQls()->SQL->query("INSERT INTO reading_timed (user_id, lesson_id, created_at, reading_time) 
 		VALUES ('$user_id', '$row_quiz_info[1]', '$now', '00:00:00') ") or die(getQls()->SQL->error());
 }
 ?>

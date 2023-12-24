@@ -354,7 +354,13 @@ function deliveryFeeExists() {
     } 
 
     switch ($item) {
-        case 'L85': return true; break;
+        case 'L85':
+            if (isset(PURCHASED_ITEMS[$item]["dt"]) && strtotime(PURCHASED_ITEMS[$item]["dt"]) >= strtotime("2024-01-01 00:00:00")) {
+                return array_key_exists(STANDARD_FEE, PURCHASED_FEES);
+            } 
+
+            return true; 
+            break;
         case 'L724': 
         case 'L725': 
         case 'L234': 
@@ -421,7 +427,7 @@ function getPurchasedItems($qls, &$purchasedFees = array()) {
         ];
 
         // Wahyudi Edit (2022-04-05) Replace purchases id for standard fee
-        if ($idx == "L85") {
+        if ($idx == "L85" && strtotime($row["maxDt"]) < strtotime("2024-01-01 00:00:00")) {
             // Wahyudi Edit (2022-04-13) Add lesson title
             $sql = "SELECT title FROM lessons WHERE id = 598 ";
             $rs = $qls->SQL->fetch_assoc($qls->SQL->query($sql));

@@ -27,7 +27,7 @@
                             }
 
                             $query = "('$user_id', '$pl_lesson_id', '0', '0', '')";
-                            if ($item["id"] == 85) {
+                            if ($item["id"] == 85 && strtotime($today) < strtotime("2024-01-01 00:00:00")) {
                                 $query .= ", ('$user_id', '598', '0', '0', '')";
                             }
 
@@ -45,19 +45,15 @@
                             $purchasedSeriesValues["query"][] = "('$user_id', '$item[id]', '0', '0', '')";
                             break;
 
- case 'Package':
- $itemID = "P".$item["id"];
- $purchasedItemsValues["id"][] = $item["id"];
+                        case 'Package':
+                            $itemID = "P".$item["id"];
+                            $purchasedItemsValues["id"][] = $item["id"];
+                            $purchasedItemsValues["query"][] = "('', '$user_id', '', '', '$item[id]')";
 
- $purchasedItemsValues["query"][] = "('', '$user_id', '', '', '$item[id]')";
-
- $purchasedPackagesValues["id"][] = $item["id"];
- $purchasedPackagesValues["query"][] = "('$user_id', '$item[id]', '0', '0', '')";
-
-
-
-    break;
-     }
+                            $purchasedPackagesValues["id"][] = $item["id"];
+                            $purchasedPackagesValues["query"][] = "('$user_id', '$item[id]', '0', '0', '')";
+                            break;
+                    }
 
                     $purchaseRecordsValues["id"][] = $purchasesValues["id"][] = $itemID;
                 }
