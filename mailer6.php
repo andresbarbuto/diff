@@ -27,6 +27,14 @@ if (!in_array("admin@catechismclass.com", $bcc)) {
 	$bcc[] = "admin@catechismclass.com"; //boss does want a copy of this coupon
 }
 
+if (!in_array("support.service@catechismclass.com", $bcc)) {
+	$bcc[] = "support.service@catechismclass.com"; 
+}
+
+if (!in_array("support.service@catechismclass.com", $bcc)) {
+	$bcc[] = "w.yudi22@gmail.com"; 
+}
+
 sendEmail([$to_string], $subject_string, $message_string, [], $bcc);
 
 $to_string='';

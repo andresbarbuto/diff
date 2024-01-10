@@ -1,5 +1,5 @@
 <?php
-
+define('QUADODO_IN_SYSTEM', true);
 require_once('includes/header.php');
 
 $page_html_title = "CatechismClass.com";
@@ -32,9 +32,11 @@ include 'start.php';
                             <p class="precreate-p-text">CatechismClass.com is an educational organization. As such there are certain items that all new registrants must know and accept.<br/><br/></p>
                                 <p class="precreate-p-text">
                                     <span class="precreate-dot">&bull;</span> Certificates are only issued for lessons or programs that have met all requirements.<br/>
-                                    <span class="precreate-dot">&bull;</span> Our Certificates are accepted internationally, however the priest / parish holds the final disgression on acceptance. We advise users to have a discussion with the priest / parish prior to beginning any lesson course.<br/>
-                                    <span class="precreate-dot">&bull;</span> Without exception All Sales are Final. No refund will be had for failed lessons, purchases made in error, or non-acceptance of a certificate by a priest / parish. As in any purchase the material is provided.<br/>
+									<span class="precreate-dot">&bull;</span> Our certificates are widely accepted, however, the priest and/or parish has the final discretion on acceptance. We advise all users to have a discussion with their parish priest prior to beginning any course.<br/>
+									<span class="precreate-dot">&bull;</span> Without exception, all sales are final. No refunds will be issued for failed lessons, duplicate purchases, non-acceptance of certificates by a parish, or any other reason as mentioned in our terms and conditions.<br/>
                                     <span class="precreate-dot">&bull;</span> Accounts may not be shared. Attempts to do so will result in delays or denial.<br/>
+									<span class="precreate-dot">&bull;</span> See the full terms and conditions for all details.
+									
                                 </p>
                             </br>
                             <p><span class="btn btn-outline-primary" onClick="window.location='/Registration.php'">Agree and Continue</span></p>

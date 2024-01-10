@@ -7,7 +7,7 @@
 
 $sacraments= array('82','83','84','721','722','723', '745', '746', '747', '748', '749');
 
-if (isset($remedial_true) && $remedial_true == 0) {
+if ($remedial_true == 0) {
 
 	if ($doctrine_count > 1) {
 		echo "<p><span style='color: black'>You have missed some fundamental questions to which all Catholics must know the answer. Please carefully study this lesson again. You will need to retake this quiz later in order to qualify for a CatechismClass.com Certificate. </span></p>";
@@ -33,7 +33,7 @@ if (isset($remedial_true) && $remedial_true == 0) {
 		
 	}
 }else{
-	//echo "remedial slot <br>"; // to be used for remedial lesson logic
+	//echo "remedial slot <br/>"; // to be used for remedial lesson logic
 }
 
 ?>

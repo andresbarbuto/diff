@@ -16,18 +16,14 @@
                 $filerun = date('y-m-d');
 
                 $orderRef = $orders = $discount = $paypal = [];
-
-                $discount["-"] = "";
-                $discount["--DONE"] = "";
-
-                $q = mysqli()->query("SELECT id, order_ref, name, customer_id, amount, email, discount_code, create_at, payment_type, paypal_response
+                $q = getQls()->SQL->query("SELECT id, order_ref, name, customer_id, amount, email, discount_code, create_at, payment_type, paypal_response
                     FROM tbl_order 
                     WHERE (paypal_response != '' OR ISNULL(paypal_response))
                         AND order_ref != ''
                         AND create_at >= '$start'
                         AND create_at <= '$end'
                     ORDER BY create_at");
-                while ($r = $q->fetch_assoc()) {
+                while ($r = getQls()->SQL->fetch_assoc($q)) {
                     if (strtolower($r["payment_type"]) == "stripe") {
                         $orderRef[$r["order_ref"].$r["paypal_response"]] = $r["id"];
                     } else {
@@ -46,19 +42,19 @@
                 }
 
                 $cond = "metadata_order_ref != '' AND balance_transaction_id != '' AND CONCAT(metadata_order_ref, balance_transaction_id) IN ('".implode("','", array_keys($orderRef))."')";
-                $q = mysqli()->query("SELECT created FROM import_stripe WHERE $cond ORDER BY created LIMIT 1");
-                $importStripeStart = ($r = $q->fetch_assoc()) ? $r["created"] : $start;
+                $q = getQls()->SQL->query("SELECT created FROM import_stripe WHERE $cond ORDER BY created LIMIT 1");
+                $importStripeStart = ($r = getQls()->SQL->fetch_assoc($q)) ? $r["created"] : $start;
 
-                $q = mysqli()->query("SELECT created FROM import_stripe WHERE $cond ORDER BY created DESC LIMIT 1");
-                $importStripeEnd = ($r = $q->fetch_assoc()) && $r["created"] > $end ? $r["created"] : $end;
+                $q = getQls()->SQL->query("SELECT created FROM import_stripe WHERE $cond ORDER BY created DESC LIMIT 1");
+                $importStripeEnd = ($r = getQls()->SQL->fetch_assoc($q)) && $r["created"] > $end ? $r["created"] : $end;
                 
                 $data = $mData = [];
-                $q = mysqli()->query("SELECT *
+                $q = getQls()->SQL->query("SELECT *
                     FROM import_stripe 
                     WHERE created >= '$importStripeStart' 
                         AND created <= '$importStripeEnd'
                     ORDER BY created");
-                while ($r = $q->fetch_assoc()) {
+                while ($r = getQls()->SQL->fetch_assoc($q)) {
                     foreach (["gross", "fee", "net", "metadata_amount", "metadata_payment_gross"] as $col) {
                         if (isset($r[$col])) {
                             $r[$col] = round($r[$col] / 100, 4);
@@ -74,8 +70,8 @@
 
                 if (!empty($paypal)) {
                     $cond = "SUBSTRING_INDEX(SUBSTRING_INDEX(content, ':', -1), '-', -1) IN ('".implode("', '", $paypal)."')";
-                    $q = mysqli()->query("SELECT * FROM paypal_txn WHERE $cond");
-                    while ($r = $q->fetch_assoc()) {
+                    $q = getQls()->SQL->query("SELECT txn, content, `date`, ga_code FROM paypal_txn WHERE $cond");
+                    while ($r = getQls()->SQL->fetch_assoc($q)) {
                         $explode = explode(":", $r["content"]);
                         if (isset($explode[2])) {
                             $orderID = str_replace(date("m-d-y-", strtotime($r["date"])), "", $explode[2]);
@@ -93,11 +89,11 @@
 
                 $skuBulkChildren = ['S-10', 'S-11', 'S-12', 'S-13', 'S-45', 'S-15', 'S-16', 'S-17'];
                 $skuBulkHighSchool = ['S-18', 'S-19', 'S-20', 'S-21', 'S-39', 'S-40', 'S-44', 'S-46'];
-                $q = mysqli()->query("SELECT order_id, product_type, product_id, item_price, quantity
+                $q = getQls()->SQL->query("SELECT order_id, product_type, product_id, item_price, quantity
                     FROM tbl_order_items 
                     WHERE order_id != '' 
                         AND order_id IN ('".implode("', '", array_keys($orders))."')");
-                while ($r = $q->fetch_assoc()) {
+                while ($r = getQls()->SQL->fetch_assoc($q)) {
                     $orders[$r["order_id"]]["items"][] = $r;
 
                     $totalItems = isset($orders[$r["order_id"]]["totalItems"]) ? $orders[$r["order_id"]]["totalItems"] : 0;
@@ -123,8 +119,8 @@
                 }
 
                 $sChildrenPrice = $sHighSchoolPrice = 0;
-                $q = mysqli()->query("SELECT id, price FROM series WHERE id IN ('10', '18')");
-                while ($r = $q->fetch_assoc()) {
+                $q = getQls()->SQL->query("SELECT id, price FROM series WHERE id IN ('10', '18')");
+                while ($r = getQls()->SQL->fetch_assoc($q)) {
                     switch ($r["id"]) {
                         case '10': $sChildrenPrice = $r["price"]; break;
                         case '19': $sHighSchoolPrice = $r["price"]; break;
@@ -134,20 +130,20 @@
                 $conditionLesson = " id != '' AND id IN ('".implode("', '", array_keys($items["L"]))."') ";
                 $conditionSeries = " id != '' AND id IN ('".implode("', '", array_keys($items["S"]))."') ";
                 $conditionPackage = " id != '' AND id IN ('".implode("', '", array_keys($items["P"]))."') ";
-                $q = mysqli()->query("
+                $q = getQls()->SQL->query("
                     SELECT id, title, 'L' AS type FROM lessons WHERE $conditionLesson UNION 
                     SELECT id, title, 'S' AS type FROM series WHERE $conditionSeries UNION
                     SELECT id, title, 'P' AS type FROM packages WHERE $conditionPackage");
-                while ($r = $q->fetch_assoc()) {
+                while ($r = getQls()->SQL->fetch_assoc($q)) {
                     $items[$r["type"]][$r["id"]] = $r["type"]."-".$r["id"].": ".$r["title"];
                 }
 
-                $q = mysqli()->query("SELECT code, amount, discount_type, affected, on_everything
+                $q = getQls()->SQL->query("SELECT code, amount, discount_type, affected, on_everything
                     FROM discounts 
                     WHERE code != '' 
                         AND UPPER(code) IN ('".implode("', '", array_keys($discount))."')");
-                while ($r = $q->fetch_assoc()) {
-                    $r["affected"] = explode(",", $r["affected"] ?? '');
+                while ($r = getQls()->SQL->fetch_assoc($q)) {
+                    $r["affected"] = explode(",", $r["affected"]);
                     $discount[strtoupper($r["code"])] = $r;
                 }
 
@@ -420,7 +416,7 @@
 
                         $cClause = "(".implode(", ", $column).")";
                         $vClause = "(".implode("), (", $data).")";
-                        mysqli()->query("INSERT INTO import_stripe $cClause 
+                        $qls->SQL->query("INSERT INTO import_stripe $cClause 
                             VALUES $vClause 
                             ON DUPLICATE KEY 
                             UPDATE updated_at = '$now'");

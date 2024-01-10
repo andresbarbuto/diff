@@ -1,13 +1,13 @@
 <?php
-    $isRequiredVariableExists = (function_exists("post") && function_exists("getFileLocation") && isset($items) && isset($today));
+    $isRequiredVariableExists = function_exists("getQls") && function_exists("post") && function_exists("getFileLocation") && isset($items) && isset($today);
     if ($isRequiredVariableExists) {
         $boom = explode(':', urldecode(post('custom')));
         $user_id = $boom[0];
-        $discount_used = (isset($boom[1]) ? $boom[1] : "");
+        $discount_used = isset($boom[1]) ? $boom[1] : "";
         $payment_gross = str_replace(",", "", post("payment_gross"));
 
-        $purchaseRecordsValues = ($purchasesValues = $purchasedItemsValues = array());
-        $purchasedLessonsValues = ($purchasedSeriesValues = $purchasedPackagesValues = array());
+        $purchaseRecordsValues = $purchasesValues = $purchasedItemsValues = array();
+        $purchasedLessonsValues = $purchasedSeriesValues = $purchasedPackagesValues = array();
         foreach ($items as $item) {
             if (isset($item["type"])) {
                 for ($i = 0; $i < $item["qty"]; $i++) { 
@@ -27,7 +27,7 @@
                             }
 
                             $query = "('$user_id', '$pl_lesson_id', '0', '0', '')";
-                            if ($item["id"] == 85) {
+                            if ($item["id"] == 85 && strtotime($today) < strtotime("2024-01-01 00:00:00")) {
                                 $query .= ", ('$user_id', '598', '0', '0', '')";
                             }
 
@@ -61,27 +61,27 @@
         }
 
         if (isset($purchaseRecordsValues["query"]) && !empty($purchaseRecordsValues["query"])) {
-            mysqli()->query("INSERT INTO purchase_records VALUES ".implode(", ", $purchaseRecordsValues["query"]));
+            getQls()->SQL->query("INSERT INTO purchase_records VALUES ".implode(", ", $purchaseRecordsValues["query"]));
         }
 
         if (isset($purchasesValues["query"]) && !empty($purchasesValues["query"])) {
-            mysqli()->query("INSERT INTO purchases (item_type, item_id, amount, created_at, updated_at, user_id) VALUES ".implode(", ", $purchasesValues["query"]));
+            getQls()->SQL->query("INSERT INTO purchases (item_type, item_id, amount, created_at, updated_at, user_id) VALUES ".implode(", ", $purchasesValues["query"]));
         }
 
         if (isset($purchasedItemsValues["query"]) && !empty($purchasedItemsValues["query"])) {
-            mysqli()->query("INSERT INTO purchased_items (id, user_id, lesson, series, package) VALUES ".implode(", ", $purchasedItemsValues["query"]));
+            getQls()->SQL->query("INSERT INTO purchased_items (id, user_id, lesson, series, package) VALUES ".implode(", ", $purchasedItemsValues["query"]));
         }
 
         if (isset($purchasedLessonsValues["query"]) && !empty($purchasedLessonsValues["query"])) {
-            mysqli()->query("INSERT INTO purchased_lessons VALUES ".implode(", ", $purchasedLessonsValues["query"]));
+            getQls()->SQL->query("INSERT INTO purchased_lessons VALUES ".implode(", ", $purchasedLessonsValues["query"]));
         } 
 
         if (isset($purchasedSeriesValues["query"]) && !empty($purchasedSeriesValues["query"])) {
-            mysqli()->query("INSERT INTO purchased_series VALUES ".implode(", ", $purchasedSeriesValues["query"]));
+            getQls()->SQL->query("INSERT INTO purchased_series VALUES ".implode(", ", $purchasedSeriesValues["query"]));
         }
 
         if (isset($purchasedPackagesValues["query"]) && !empty($purchasedPackagesValues["query"])) {
-            mysqli()->query("INSERT INTO purchased_packages VALUES ".implode(", ", $purchasedPackagesValues["query"]));
+            getQls()->SQL->query("INSERT INTO purchased_packages VALUES ".implode(", ", $purchasedPackagesValues["query"]));
         }
     }
 ?>

@@ -26,7 +26,7 @@
 {elseif $status == CurrentStatus::NotFoundDeliveryFee}
     <p><big>
         Please order a 
-        {if $smarty.const.REQUEST_TYPE==2}
+        {if $smarty.const.REQUEST_TYPE==2 && !$isL85NewMethod}
         <a class="shop-pop-up-button" data-redirect="/successPurchase.php" href="/shop/lessons_detail.php?id=598">
         {else}
         <a class="shop-pop-up-button" data-redirect="/successPurchase.php" href="/shop/lessons_detail.php?id=608">
@@ -42,7 +42,7 @@
         <a class="shop-pop-up-button" data-redirect="/successPurchase.php" href="/shop/lessons_detail.php?id=604">
             a mailed hard copy sent via the US Postal Service
         </a>. 
-    </p>
+    <big></p>
     <script src="/scripts/shop-pop-up-button.js"></script>
 {elseif $status == CurrentStatus::NotFoundInternationalMailingFee}
     <p><big>
@@ -50,7 +50,7 @@
         <a class="shop-pop-up-button" data-redirect="/successPurchase.php" href="/shop/lessons_detail.php?id=605">
             Please obtain that to proceed with your order
         </a>
-    </p>
+    <big></p>
     <script src="/scripts/shop-pop-up-button.js"></script>
 {elseif $status==CurrentStatus::SuccessfulCompletion}
     {$smarty.const.HOLIDAY_MESSAGE}
